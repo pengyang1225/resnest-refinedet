@@ -9,6 +9,7 @@
 import math
 import torch
 import torch.nn as nn
+from visdom import Visdom
 
 from .splat import SplAtConv2d
 
@@ -336,6 +337,8 @@ class ResNet_SSD(nn.Module):
                  avd=False, avd_first=False,
                  final_drop=0.0, dropblock_prob=0,
                  last_gamma=False, norm_layer=nn.BatchNorm2d):
+        self.viz = Visdom(server='http://127.0.0.1', port=8097)
+        assert self.viz.check_connection()
         self.cardinality = groups
         self.bottleneck_width = bottleneck_width
         # ResNet-D params
@@ -346,6 +349,7 @@ class ResNet_SSD(nn.Module):
         self.radix = radix
         self.avd = avd
         self.avd_first = avd_first
+        self.visdon_index=0
 
         super(ResNet_SSD, self).__init__()
         self.rectified_conv = rectified_conv
@@ -463,12 +467,20 @@ class ResNet_SSD(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        #image1 = x[:10]
+        #image1 = x[:, :3].cpu().detach().numpy()
+        #self.viz.images(image1, nrow=4,win='source_image1', opts={'title': 'source_image1'})
         x = self.conv1(x)
+
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
 
         x = self.layer1(x)
+       # viem_pic =x[:,:1].cpu().detach().numpy()
+       # self.viz.images(viem_pic,nrow=20,win='image1', opts={'title': 'images'})
+
+        #self.viz.images(viem_pic.view(1, 3, 80, 80), win='image1', opts={'title': 'images'})
         feature1 = self.layer2(x)
         feature2 = self.layer3(feature1)
         feature3 = self.layer4(feature2)

@@ -17,6 +17,8 @@ import numpy as np
 import argparse
 from utils.logging import Logger
 
+from visdom import Visdom
+
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
@@ -57,6 +59,7 @@ parser.add_argument('--save_folder', default='/home/py/Disk700G/2019code/Refined
 args = parser.parse_args()
 
 
+
 if torch.cuda.is_available():
     if args.cuda:
         torch.set_default_tensor_type('torch.cuda.FloatTensor')
@@ -81,6 +84,11 @@ def train():
         dataset = VOCDetection(root=args.dataset_root,
                                transform=SSDAugmentation(cfg['min_dim'],
                                                          MEANS))
+    #可视化
+    viz = Visdom(server='http://127.0.0.1', port=8097)
+    assert viz.check_connection()
+    viz.line([[0.0, 0.0]], [0.], win='ARM_LOSS', opts=dict(title='arm_loss', legend=['ARM_L Loss', 'ARM_C Loss']))
+    viz.line([[0.0, 0.0]], [0.], win='ODM_LOSS', opts=dict(title='omd_loss', legend=['ODM_L Loss', 'ODM_C Loss']))
 
     refinedet_net = build_refinedet(cfg['min_dim'], cfg['num_classes'])
     net = refinedet_net
@@ -183,6 +191,11 @@ def train():
         odm_conf_loss += odm_loss_c.item()
 
         if iteration % 10 == 0:
+          #  viz.line()
+
+            viz.line([[arm_loss_l.item(), arm_loss_c.item()]], [iteration], win='ARM_LOSS', update='append')
+            viz.line([[odm_loss_l.item(), odm_loss_c.item()]], [iteration], win='ODM_LOSS', update='append')
+
             print('timer: %.4f sec.' % (t1 - t0))
             print('iter ' + repr(iteration) + ' || ARM_L Loss: %.4f ARM_C Loss: %.4f ODM_L Loss: %.4f ODM_C Loss: %.4f ||' \
             % (arm_loss_l.item(), arm_loss_c.item(), odm_loss_l.item(), odm_loss_c.item()), end=' ')

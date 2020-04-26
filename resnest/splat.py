@@ -51,7 +51,7 @@ class SplAtConv2d(Module):
 
         batch, channel = x.shape[:2]
         if self.radix > 1:
-            splited = torch.split(x, channel//self.radix, dim=1)
+            splited = torch.split(x, int(channel//self.radix), dim=1)
             gap = sum(splited) 
         else:
             gap = x
@@ -69,7 +69,7 @@ class SplAtConv2d(Module):
             atten = F.sigmoid(atten, dim=1).view(batch, -1, 1, 1)
 
         if self.radix > 1:
-            atten = torch.split(atten, channel//self.radix, dim=1)
+            atten = torch.split(atten, int(channel//self.radix), dim=1)
             out = sum([att*split for (att, split) in zip(atten, splited)])
         else:
             out = atten * x
