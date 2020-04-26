@@ -5,6 +5,7 @@ A higher performance [PyTorch](http://pytorch.org/) implementation of [Single-Sh
 
 ###简介
 本实验我没有在VOC上进行测试对比，针对于实际项目实验发现：resnet50-86-refinedet的检测网络，耗时方面较原本vgg时间减少了一半，resnest50的性能较resnet50也有很大的提升。
+###
 ### Table of Contents
 - <a href='#performance'>Performance</a>
 - <a href='#installation'>Installation</a>
@@ -78,7 +79,7 @@ sh data/scripts/VOC2012.sh # <directory>
 
 ## Training RefineDet
 - First download the fc-reduced [Resnest](https://hangzhang.org/files/resnest.pdf ) PyTorch base network weights at:              https://hangzh.s3.amazonaws.com/encoding/models/resnest50-528c19ca.pth
-- and, I have downloaded the file in the `resnest-refinedet/weights` dir:
+- and, I have downloaded the file in the `resnest-refinedet/weights` dir:[resnest50](https://pan.baidu.com/s/1Yw3TXtP7SHQbIEB1E3xuPA);秘钥4a7k
 
 
 
